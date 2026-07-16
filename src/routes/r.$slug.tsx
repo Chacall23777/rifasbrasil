@@ -53,8 +53,8 @@ function RifaPage() {
     queryKey: ["rifa-numeros", rifa.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("rifa_numeros")
-        .select("numero, status, comprador_nome")
+        .from("rifa_numeros_public")
+        .select("numero, status")
         .eq("rifa_id", rifa.id);
       if (error) throw error;
       return data;
@@ -65,7 +65,7 @@ function RifaPage() {
     queryKey: ["organizador", rifa.organizador_id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("nome, cidade, estado")
         .eq("id", rifa.organizador_id)
         .maybeSingle();
@@ -139,7 +139,7 @@ function RifaPage() {
 
         <SelecionarNumeros
           rifa={rifa}
-          numeros={numeros ?? []}
+          numeros={(numeros ?? []).filter((n): n is { numero: number; status: string } => n.numero !== null && n.status !== null)}
           open={openReserva}
           onOpenChange={setOpenReserva}
           selecionados={selecionados}
@@ -212,12 +212,9 @@ function SelecionarNumeros({
       supabase.auth.getUser().then(async ({ data }) => {
         setUserChecked(data.user);
         if (data.user) {
-          const { data: p } = await supabase
-            .from("profiles")
-            .select("nome, email, telefone")
-            .eq("id", data.user.id)
-            .maybeSingle();
-          if (p) setBuyer({ nome: p.nome ?? "", email: p.email ?? data.user.email ?? "", telefone: p.telefone ?? "" });
+          const { data: p } = await supabase.rpc("get_my_profile");
+          const row = Array.isArray(p) ? p[0] : p;
+          if (row) setBuyer({ nome: row.nome ?? "", email: row.email ?? data.user.email ?? "", telefone: row.telefone ?? "" });
         }
       });
     }

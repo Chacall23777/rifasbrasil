@@ -200,10 +200,136 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          cidade: string | null
+          estado: string | null
+          foto_url: string | null
+          id: string | null
+          nome: string | null
+          username: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+          username?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      rifa_numeros_public: {
+        Row: {
+          aprovado_em: string | null
+          id: string | null
+          numero: number | null
+          reservado_em: string | null
+          rifa_id: string | null
+          status: string | null
+        }
+        Insert: {
+          aprovado_em?: string | null
+          id?: string | null
+          numero?: number | null
+          reservado_em?: string | null
+          rifa_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          aprovado_em?: string | null
+          id?: string | null
+          numero?: number | null
+          reservado_em?: string | null
+          rifa_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rifa_numeros_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_meus_numeros: {
+        Args: never
+        Returns: {
+          aprovado_em: string | null
+          comprador_email: string | null
+          comprador_id: string | null
+          comprador_nome: string | null
+          comprador_telefone: string | null
+          comprovante_url: string | null
+          id: string
+          numero: number
+          reservado_em: string
+          rifa_id: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "rifa_numeros"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          chave_pix: string | null
+          cidade: string | null
+          created_at: string
+          email: string | null
+          estado: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+          username: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_numeros_da_rifa: {
+        Args: { _rifa_id: string }
+        Returns: {
+          aprovado_em: string | null
+          comprador_email: string | null
+          comprador_id: string | null
+          comprador_nome: string | null
+          comprador_telefone: string | null
+          comprovante_url: string | null
+          id: string
+          numero: number
+          reservado_em: string
+          rifa_id: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "rifa_numeros"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
