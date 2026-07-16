@@ -200,7 +200,62 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          cidade: string | null
+          estado: string | null
+          foto_url: string | null
+          id: string | null
+          nome: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+        }
+        Relationships: []
+      }
+      rifa_numeros_public: {
+        Row: {
+          id: string | null
+          numero: number | null
+          reservado_em: string | null
+          rifa_id: string | null
+          status: string | null
+        }
+        Insert: {
+          id?: string | null
+          numero?: number | null
+          reservado_em?: string | null
+          rifa_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          id?: string | null
+          numero?: number | null
+          reservado_em?: string | null
+          rifa_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rifa_numeros_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
