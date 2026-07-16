@@ -71,8 +71,11 @@ function MinhasRifas() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <Button asChild size="sm" variant="secondary">
+                    <Link to="/rifas/$id/aprovacoes" params={{ id: r.id }}>Aprovações</Link>
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
-                    <Pencil className="mr-1 h-3.5 w-3.5" /> Editar link
+                    <Pencil className="mr-1 h-3.5 w-3.5" /> Link
                   </Button>
                   <Button asChild size="sm" variant="outline">
                     <Link to="/r/$slug" params={{ slug: r.slug }}>Ver página</Link>
