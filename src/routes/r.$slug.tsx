@@ -258,7 +258,7 @@ function ResultadoSorteio({
       {nome && <p className="text-sm text-muted-foreground">Ganhador(a): {nome}</p>}
       <div className="mt-3 flex flex-wrap gap-2">
         <Button asChild size="sm" variant="outline">
-          
+          <a
             href={`https://wa.me/?text=${encodeURIComponent(texto)}`}
             target="_blank"
             rel="noopener noreferrer"
