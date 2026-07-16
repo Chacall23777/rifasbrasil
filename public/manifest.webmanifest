@@ -1,0 +1,19 @@
+{
+  "name": "RIFASBRASIL — Rifas online grátis",
+  "short_name": "RifasBrasil",
+  "description": "Crie e gerencie rifas online gratuitamente. Receba direto no seu PIX.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
