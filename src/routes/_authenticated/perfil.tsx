@@ -26,14 +26,10 @@ function Perfil() {
   });
 
   useEffect(() => {
-    supabase
-      .from("profiles")
-      .select("nome, email, telefone, cidade, estado, chave_pix, foto_url")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setForm((f) => ({ ...f, ...data, email: data.email ?? f.email }) as any);
-      });
+    supabase.rpc("get_my_profile").then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row) setForm((f) => ({ ...f, ...row, email: row.email ?? f.email }) as any);
+    });
   }, [user.id]);
 
   async function submit(e: React.FormEvent) {
