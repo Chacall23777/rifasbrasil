@@ -282,7 +282,14 @@ function SelecionarNumeros({
 
   async function reservar() {
     if (!userChecked) {
-      toast.error("Faça login para participar");
+      // Salva rifa + números selecionados para retomar automaticamente após o login
+      try {
+        localStorage.setItem(
+          "rifa_pending",
+          JSON.stringify({ slug: rifa.slug, numeros: selecionados, autoOpen: true }),
+        );
+      } catch {}
+      toast.message("Crie sua conta em 30s para participar");
       window.location.href = "/auth?redirect=" + encodeURIComponent(window.location.pathname);
       return;
     }
