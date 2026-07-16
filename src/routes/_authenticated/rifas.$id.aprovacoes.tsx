@@ -29,7 +29,9 @@ function Aprovacoes() {
   const { id: rifaId } = Route.useParams();
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const [filter, setFilter] = useState<"reservado" | "aprovado" | "rejeitado" | "todos">("reservado");
+  const [filter, setFilter] = useState<"reservado" | "aprovado" | "rejeitado" | "todos">(
+    "reservado",
+  );
 
   const { data: rifa } = useQuery({
     queryKey: ["rifa-owner", rifaId],
@@ -59,22 +61,27 @@ function Aprovacoes() {
   const filtered = useMemo(() => {
     if (!itens) return [];
     if (filter === "todos") return itens;
-    return itens.filter((i) => (i.status || "").toLowerCase() === filter);
+    const alvo = filter === "aprovado" ? "pago" : filter === "rejeitado" ? "cancelado" : filter;
+    return itens.filter((i) => (i.status || "").toLowerCase() === alvo);
   }, [itens, filter]);
 
   const contagem = useMemo(() => {
     const c = { reservado: 0, aprovado: 0, rejeitado: 0 };
     (itens || []).forEach((i) => {
       const s = (i.status || "").toLowerCase();
-      if (s in c) (c as any)[s]++;
+      if (s === "pago") c.aprovado++;
+      else if (s === "cancelado") c.rejeitado++;
+      else if (s === "reservado") c.reservado++;
     });
     return c;
   }, [itens]);
 
   async function aprovar(item: Item) {
+    // O status válido na tabela é 'pago' (não 'aprovado') — o check constraint
+    // rifa_numeros_status_check só aceita 'reservado' | 'pago' | 'cancelado'.
     const { error } = await supabase
       .from("rifa_numeros")
-      .update({ status: "aprovado", aprovado_em: new Date().toISOString() })
+      .update({ status: "pago", aprovado_em: new Date().toISOString() })
       .eq("id", item.id);
     if (error) return toast.error(error.message);
     toast.success(`Número ${item.numero} aprovado`);
@@ -82,19 +89,14 @@ function Aprovacoes() {
   }
 
   async function rejeitar(item: Item) {
-    const { error } = await supabase
-      .from("rifa_numeros")
-      .delete()
-      .eq("id", item.id);
+    const { error } = await supabase.from("rifa_numeros").delete().eq("id", item.id);
     if (error) return toast.error(error.message);
     toast.success(`Número ${item.numero} liberado`);
     qc.invalidateQueries({ queryKey: ["numeros-owner", rifaId] });
   }
 
   async function abrirComprovante(path: string) {
-    const { data, error } = await supabase.storage
-      .from("comprovantes")
-      .createSignedUrl(path, 300);
+    const { data, error } = await supabase.storage.from("comprovantes").createSignedUrl(path, 300);
     if (error || !data?.signedUrl) return toast.error("Não foi possível abrir o comprovante");
     window.open(data.signedUrl, "_blank", "noopener");
   }
@@ -112,7 +114,9 @@ function Aprovacoes() {
     return (
       <div className="min-h-screen bg-accent/20">
         <SiteHeader />
-        <div className="mx-auto max-w-3xl px-4 py-10 text-center">Você não é o organizador desta rifa.</div>
+        <div className="mx-auto max-w-3xl px-4 py-10 text-center">
+          Você não é o organizador desta rifa.
+        </div>
       </div>
     );
   }
@@ -121,7 +125,10 @@ function Aprovacoes() {
     <div className="min-h-screen bg-accent/20">
       <SiteHeader />
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <Link to="/minhas-rifas" className="mb-3 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+        <Link
+          to="/minhas-rifas"
+          className="mb-3 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> Minhas rifas
         </Link>
         <h1 className="text-2xl font-bold md:text-3xl">Aprovações</h1>
@@ -165,8 +172,8 @@ function Aprovacoes() {
                         <span className="rounded-md bg-primary/10 px-2 py-0.5 text-sm font-bold text-primary">
                           Nº {String(i.numero).padStart(3, "0")}
                         </span>
-                        <Badge variant={status === "aprovado" ? "default" : "secondary"}>
-                          {status || "reservado"}
+                        <Badge variant={status === "pago" ? "default" : "secondary"}>
+                          {status === "pago" ? "aprovado" : status || "reservado"}
                         </Badge>
                       </div>
                       <p className="mt-2 font-medium">{i.comprador_nome ?? "—"}</p>
@@ -175,16 +182,21 @@ function Aprovacoes() {
                         {i.comprador_email ? ` · ${i.comprador_email}` : ""}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Reservado em {i.reservado_em ? new Date(i.reservado_em).toLocaleString("pt-BR") : "—"}
+                        Reservado em{" "}
+                        {i.reservado_em ? new Date(i.reservado_em).toLocaleString("pt-BR") : "—"}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {i.comprovante_url && (
-                        <Button size="sm" variant="outline" onClick={() => abrirComprovante(i.comprovante_url!)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => abrirComprovante(i.comprovante_url!)}
+                        >
                           <FileText className="mr-1 h-3.5 w-3.5" /> Comprovante
                         </Button>
                       )}
-                      {status !== "aprovado" && (
+                      {status !== "pago" && (
                         <Button size="sm" onClick={() => aprovar(i)}>
                           <Check className="mr-1 h-3.5 w-3.5" /> Aprovar
                         </Button>
@@ -203,3 +215,7 @@ function Aprovacoes() {
     </div>
   );
 }
+
+ 
+
+  
