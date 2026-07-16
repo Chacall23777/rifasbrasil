@@ -14,13 +14,170 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          chave_pix: string | null
+          cidade: string | null
+          created_at: string
+          email: string | null
+          estado: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          chave_pix?: string | null
+          cidade?: string | null
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          chave_pix?: string | null
+          cidade?: string | null
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      rifa_numeros: {
+        Row: {
+          aprovado_em: string | null
+          comprador_email: string | null
+          comprador_id: string | null
+          comprador_nome: string | null
+          comprador_telefone: string | null
+          comprovante_url: string | null
+          id: string
+          numero: number
+          reservado_em: string
+          rifa_id: string
+          status: string
+        }
+        Insert: {
+          aprovado_em?: string | null
+          comprador_email?: string | null
+          comprador_id?: string | null
+          comprador_nome?: string | null
+          comprador_telefone?: string | null
+          comprovante_url?: string | null
+          id?: string
+          numero: number
+          reservado_em?: string
+          rifa_id: string
+          status?: string
+        }
+        Update: {
+          aprovado_em?: string | null
+          comprador_email?: string | null
+          comprador_id?: string | null
+          comprador_nome?: string | null
+          comprador_telefone?: string | null
+          comprovante_url?: string | null
+          id?: string
+          numero?: number
+          reservado_em?: string
+          rifa_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rifa_numeros_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rifas: {
+        Row: {
+          chave_pix: string
+          created_at: string
+          data_encerramento: string | null
+          data_sorteio: string | null
+          descricao: string | null
+          foto_principal: string | null
+          galeria: Json
+          id: string
+          nome_ganhador: string | null
+          numero_vencedor: number | null
+          organizador_id: string
+          quantidade_numeros: number
+          regulamento: string | null
+          slug: string
+          status: string
+          titulo: string
+          updated_at: string
+          valor_numero: number
+          visitas: number
+        }
+        Insert: {
+          chave_pix: string
+          created_at?: string
+          data_encerramento?: string | null
+          data_sorteio?: string | null
+          descricao?: string | null
+          foto_principal?: string | null
+          galeria?: Json
+          id?: string
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
+          organizador_id: string
+          quantidade_numeros: number
+          regulamento?: string | null
+          slug: string
+          status?: string
+          titulo: string
+          updated_at?: string
+          valor_numero: number
+          visitas?: number
+        }
+        Update: {
+          chave_pix?: string
+          created_at?: string
+          data_encerramento?: string | null
+          data_sorteio?: string | null
+          descricao?: string | null
+          foto_principal?: string | null
+          galeria?: Json
+          id?: string
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
+          organizador_id?: string
+          quantidade_numeros?: number
+          regulamento?: string | null
+          slug?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+          valor_numero?: number
+          visitas?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      incrementar_visita: { Args: { rifa_slug: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
