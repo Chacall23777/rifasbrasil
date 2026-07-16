@@ -133,3 +133,12 @@ function Dashboard() {
     </div>
   );
 }
+
+function StatCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className={`rounded-2xl border bg-card p-4 shadow-soft ${highlight ? "border-primary/60" : ""}`}>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`mt-1 text-2xl font-bold ${highlight ? "text-primary" : ""}`}>{value}</p>
+    </div>
+  );
+}
