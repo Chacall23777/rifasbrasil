@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QRCode from "qrcode";
@@ -23,7 +23,16 @@ export const Route = createFileRoute("/r/$slug")({
       .eq("slug", params.slug)
       .maybeSingle();
     if (error) throw error;
-    if (!data) throw notFound();
+    if (!data) {
+      const { data: red } = await supabase
+        .from("rifa_slug_redirects")
+        .select("rifa_id, rifas!inner(slug)")
+        .eq("old_slug", params.slug)
+        .maybeSingle();
+      const newSlug = (red as any)?.rifas?.slug;
+      if (newSlug) throw redirect({ to: "/r/$slug", params: { slug: newSlug }, replace: true });
+      throw notFound();
+    }
     return { rifa: data };
   },
   head: ({ loaderData }) => ({
