@@ -26,6 +26,34 @@ function Dashboard() {
     },
   });
 
+  const { data: stats } = useQuery({
+    queryKey: ["dashboard-stats", user.id],
+    queryFn: async () => {
+      // Todos os números das minhas rifas (org policy permite ler)
+      const { data: rows, error } = await supabase
+        .from("rifa_numeros")
+        .select("comprador_id, status, rifa_id, rifas!inner(valor_numero, organizador_id)")
+        .eq("rifas.organizador_id", user.id);
+      if (error) throw error;
+      let arrecadado = 0;
+      let vendidos = 0;
+      let pendentes = 0;
+      const participantes = new Set<string>();
+      (rows || []).forEach((r: any) => {
+        const s = (r.status || "").toLowerCase();
+        const valor = Number(r.rifas?.valor_numero || 0);
+        if (s === "aprovado") {
+          arrecadado += valor;
+          vendidos += 1;
+          if (r.comprador_id) participantes.add(r.comprador_id);
+        } else if (s === "reservado") {
+          pendentes += 1;
+        }
+      });
+      return { arrecadado, vendidos, pendentes, participantes: participantes.size };
+    },
+  });
+
   const cards = [
     { to: "/criar-rifa", icon: PlusCircle, title: "Criar nova rifa", desc: "Comece uma rifa em minutos" },
     { to: "/minhas-rifas", icon: Ticket, title: "Minhas rifas", desc: "Gerencie e acompanhe" },
