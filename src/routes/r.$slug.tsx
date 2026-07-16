@@ -254,6 +254,8 @@ function SelecionarNumeros({
   const [userChecked, setUserChecked] = useState<any>(null);
   const [pending, setPending] = useState(false);
   const [buyer, setBuyer] = useState({ nome: "", email: "", telefone: "" });
+  const [reservedIds, setReservedIds] = useState<string[]>([]);
+  const [chavePix, setChavePix] = useState<string>("");
 
   useEffect(() => {
     if (open) {
