@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/criar-rifa")({
 
 const schema = z.object({
   titulo: z.string().trim().min(3, "Título muito curto").max(120),
+  slug_custom: z.string().trim().max(60).optional(),
   descricao: z.string().max(2000).optional(),
   foto_principal: z.string().url("URL inválida").optional().or(z.literal("")),
   quantidade_numeros: z.number().int().min(2).max(100000),
