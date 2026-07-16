@@ -106,6 +106,32 @@ export type Database = {
           },
         ]
       }
+      rifa_visitas: {
+        Row: {
+          created_at: string
+          id: number
+          rifa_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          rifa_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          rifa_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rifa_visitas_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rifas: {
         Row: {
           chave_pix: string
@@ -177,7 +203,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      incrementar_visita: { Args: { rifa_slug: string }; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
