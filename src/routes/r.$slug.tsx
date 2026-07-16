@@ -35,17 +35,19 @@ export const Route = createFileRoute("/r/$slug")({
     }
     return { rifa: data };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.rifa.titulo} — RIFASBRASIL` },
-          { name: "description", content: loaderData.rifa.descricao?.slice(0, 155) || "Participe desta rifa no RIFASBRASIL." },
-          { property: "og:title", content: loaderData.rifa.titulo },
-          { property: "og:description", content: loaderData.rifa.descricao?.slice(0, 155) || "Participe desta rifa no RIFASBRASIL." },
-          ...(loaderData.rifa.foto_principal ? [{ property: "og:image", content: loaderData.rifa.foto_principal }] : []),
-        ]
-      : [{ title: "Rifa — RIFASBRASIL" }],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Rifa — RIFASBRASIL" }] };
+    const desc = loaderData.rifa.descricao?.slice(0, 155) || "Participe desta rifa no RIFASBRASIL.";
+    return {
+      meta: [
+        { title: `${loaderData.rifa.titulo} — RIFASBRASIL` },
+        { name: "description", content: desc },
+        { property: "og:title", content: loaderData.rifa.titulo },
+        { property: "og:description", content: desc },
+        ...(loaderData.rifa.foto_principal ? [{ property: "og:image", content: loaderData.rifa.foto_principal }] : []),
+      ],
+    };
+  },
   component: RifaPage,
 });
 
