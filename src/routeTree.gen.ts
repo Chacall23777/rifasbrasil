@@ -14,6 +14,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as AuthenticatedRifasParticipadasRouteImport } from './routes/_authenticated/rifas-participadas'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMinhasRifasRouteImport } from './routes/_authenticated/minhas-rifas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCriarRifaRouteImport } from './routes/_authenticated/criar-rifa'
@@ -42,6 +44,17 @@ const RSlugRoute = RSlugRouteImport.update({
   path: '/r/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRifasParticipadasRoute =
+  AuthenticatedRifasParticipadasRouteImport.update({
+    id: '/rifas-participadas',
+    path: '/rifas-participadas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMinhasRifasRoute =
   AuthenticatedMinhasRifasRouteImport.update({
     id: '/minhas-rifas',
@@ -66,6 +79,8 @@ export interface FileRoutesByFullPath {
   '/criar-rifa': typeof AuthenticatedCriarRifaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesByTo {
@@ -75,6 +90,8 @@ export interface FileRoutesByTo {
   '/criar-rifa': typeof AuthenticatedCriarRifaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesById {
@@ -86,6 +103,8 @@ export interface FileRoutesById {
   '/_authenticated/criar-rifa': typeof AuthenticatedCriarRifaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
 }
 export interface FileRouteTypes {
@@ -97,6 +116,8 @@ export interface FileRouteTypes {
     | '/criar-rifa'
     | '/dashboard'
     | '/minhas-rifas'
+    | '/perfil'
+    | '/rifas-participadas'
     | '/r/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,6 +127,8 @@ export interface FileRouteTypes {
     | '/criar-rifa'
     | '/dashboard'
     | '/minhas-rifas'
+    | '/perfil'
+    | '/rifas-participadas'
     | '/r/$slug'
   id:
     | '__root__'
@@ -116,6 +139,8 @@ export interface FileRouteTypes {
     | '/_authenticated/criar-rifa'
     | '/_authenticated/dashboard'
     | '/_authenticated/minhas-rifas'
+    | '/_authenticated/perfil'
+    | '/_authenticated/rifas-participadas'
     | '/r/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -164,6 +189,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/rifas-participadas': {
+      id: '/_authenticated/rifas-participadas'
+      path: '/rifas-participadas'
+      fullPath: '/rifas-participadas'
+      preLoaderRoute: typeof AuthenticatedRifasParticipadasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/minhas-rifas': {
       id: '/_authenticated/minhas-rifas'
       path: '/minhas-rifas'
@@ -192,12 +231,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCriarRifaRoute: typeof AuthenticatedCriarRifaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMinhasRifasRoute: typeof AuthenticatedMinhasRifasRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedRifasParticipadasRoute: typeof AuthenticatedRifasParticipadasRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCriarRifaRoute: AuthenticatedCriarRifaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMinhasRifasRoute: AuthenticatedMinhasRifasRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedRifasParticipadasRoute: AuthenticatedRifasParticipadasRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
