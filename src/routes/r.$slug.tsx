@@ -139,7 +139,7 @@ function RifaPage() {
 
         <SelecionarNumeros
           rifa={rifa}
-          numeros={numeros ?? []}
+          numeros={(numeros ?? []).filter((n): n is { numero: number; status: string } => n.numero !== null && n.status !== null)}
           open={openReserva}
           onOpenChange={setOpenReserva}
           selecionados={selecionados}
