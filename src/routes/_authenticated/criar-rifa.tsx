@@ -34,6 +34,7 @@ function CriarRifa() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     titulo: "",
+    slug_custom: "",
     descricao: "",
     foto_principal: "",
     quantidade_numeros: 100,
@@ -50,10 +51,20 @@ function CriarRifa() {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
     setLoading(true);
-    // gera slug único
-    let slug = slugify(form.titulo) || "rifa";
-    const { data: existing } = await supabase.from("rifas").select("id").eq("slug", slug).maybeSingle();
-    if (existing) slug = `${slug}-${randomSuffix()}`;
+    // Slug: usa o personalizado se informado, senão gera do título
+    const base = slugify(form.slug_custom || form.titulo) || "rifa";
+    let slug = base;
+    const [{ data: r1 }, { data: r2 }] = await Promise.all([
+      supabase.from("rifas").select("id").eq("slug", slug).maybeSingle(),
+      supabase.from("rifa_slug_redirects").select("old_slug").eq("old_slug", slug).maybeSingle(),
+    ]);
+    if (r1 || r2) {
+      if (form.slug_custom) {
+        setLoading(false);
+        return toast.error("Este link já está em uso. Escolha outro.");
+      }
+      slug = `${base}-${randomSuffix()}`;
+    }
 
     const { data, error } = await supabase
       .from("rifas")
