@@ -6,7 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -18,7 +24,7 @@ export const Route = createFileRoute("/r/$slug")({
     const { data, error } = await supabase
       .from("rifas_public")
       .select(
-        "id, slug, titulo, descricao, foto_principal, quantidade_numeros, valor_numero, data_sorteio, data_encerramento, regulamento, status, organizador_id, visitas",
+        "id, slug, titulo, descricao, foto_principal, quantidade_numeros, valor_numero, data_sorteio, data_encerramento, regulamento, status, organizador_id, visitas, numero_vencedor, nome_ganhador",
       )
       .eq("slug", params.slug)
       .maybeSingle();
@@ -59,7 +65,10 @@ function RifaPage() {
 
   // Registra visita anonimamente (uma vez por sessão da página)
   useEffect(() => {
-    supabase.from("rifa_visitas").insert({ rifa_id: rifa.id }).then(() => {});
+    supabase
+      .from("rifa_visitas")
+      .insert({ rifa_id: rifa.id })
+      .then(() => {});
   }, [rifa.id]);
 
   const { data: numeros } = useQuery({
@@ -127,14 +136,17 @@ function RifaPage() {
     } catch {}
   }, [selecionados, rifa.slug]);
 
-
   return (
     <div className="min-h-screen bg-accent/20">
       <SiteHeader />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <div className="overflow-hidden rounded-3xl border bg-card shadow-lift">
           {rifa.foto_principal ? (
-            <img src={rifa.foto_principal} alt={rifa.titulo} className="aspect-video w-full object-cover" />
+            <img
+              src={rifa.foto_principal}
+              alt={rifa.titulo}
+              className="aspect-video w-full object-cover"
+            />
           ) : (
             <div className="grid aspect-video place-items-center bg-muted text-6xl">🎟️</div>
           )}
@@ -148,7 +160,9 @@ function RifaPage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black text-primary">R$ {Number(rifa.valor_numero).toFixed(2)}</p>
+                <p className="text-2xl font-black text-primary">
+                  R$ {Number(rifa.valor_numero).toFixed(2)}
+                </p>
                 <p className="text-xs text-muted-foreground">por número</p>
               </div>
             </div>
@@ -163,10 +177,22 @@ function RifaPage() {
               <Progress value={percentual} />
             </div>
 
+            {rifa.status === "sorteada" && rifa.numero_vencedor != null && (
+              <ResultadoSorteio
+                titulo={rifa.titulo}
+                numero={rifa.numero_vencedor}
+                nome={rifa.nome_ganhador}
+              />
+            )}
+
             <ShareRow titulo={rifa.titulo} />
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => setOpenReserva(true)} disabled={rifa.status !== "ativa" || disponiveis === 0}>
+              <Button
+                size="lg"
+                onClick={() => setOpenReserva(true)}
+                disabled={rifa.status !== "ativa" || disponiveis === 0}
+              >
                 {disponiveis === 0 ? "Esgotada" : "Escolher meus números"}
               </Button>
             </div>
@@ -178,8 +204,12 @@ function RifaPage() {
             )}
             {rifa.regulamento && (
               <details className="mt-4">
-                <summary className="cursor-pointer text-sm font-medium text-primary">Regulamento</summary>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{rifa.regulamento}</p>
+                <summary className="cursor-pointer text-sm font-medium text-primary">
+                  Regulamento
+                </summary>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                  {rifa.regulamento}
+                </p>
               </details>
             )}
           </div>
@@ -187,13 +217,58 @@ function RifaPage() {
 
         <SelecionarNumeros
           rifa={rifa}
-          numeros={(numeros ?? []).filter((n): n is { numero: number; status: string } => n.numero !== null && n.status !== null)}
+          numeros={(numeros ?? []).filter(
+            (n): n is { numero: number; status: string } => n.numero !== null && n.status !== null,
+          )}
           open={openReserva}
           onOpenChange={setOpenReserva}
           selecionados={selecionados}
           setSelecionados={setSelecionados}
           onSuccess={() => queryClient.invalidateQueries({ queryKey: ["rifa-numeros", rifa.id] })}
         />
+      </div>
+    </div>
+  );
+}
+
+function ResultadoSorteio({
+  titulo,
+  numero,
+  nome,
+}: {
+  titulo: string;
+  numero: number;
+  nome: string | null;
+}) {
+  const [url, setUrl] = useState("");
+  useEffect(() => setUrl(window.location.href), []);
+  const texto = `🎉 Resultado da rifa "${titulo}": número ${String(numero).padStart(3, "0")}${nome ? ` — ${nome}` : ""}! Confira: ${url}`;
+
+  async function copiar() {
+    await navigator.clipboard.writeText(texto);
+    toast.success("Resultado copiado!");
+  }
+
+  return (
+    <div className="mt-5 rounded-2xl border border-primary/30 bg-primary/5 p-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-primary">
+        Resultado do sorteio
+      </p>
+      <p className="mt-1 text-xl font-black">Número {String(numero).padStart(3, "0")}</p>
+      {nome && <p className="text-sm text-muted-foreground">Ganhador(a): {nome}</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button asChild size="sm" variant="outline">
+          
+            href={`https://wa.me/?text=${encodeURIComponent(texto)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Share2 className="mr-1 h-3.5 w-3.5" /> Compartilhar
+          </a>
+        </Button>
+        <Button size="sm" variant="ghost" onClick={copiar}>
+          <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
+        </Button>
       </div>
     </div>
   );
@@ -206,7 +281,10 @@ function ShareRow({ titulo }: { titulo: string }) {
   const encUrl = encodeURIComponent(url);
   const links = [
     { label: "WhatsApp", href: `https://wa.me/?text=${enc}` },
-    { label: "Telegram", href: `https://t.me/share/url?url=${encUrl}&text=${encodeURIComponent(titulo)}` },
+    {
+      label: "Telegram",
+      href: `https://t.me/share/url?url=${encUrl}&text=${encodeURIComponent(titulo)}`,
+    },
     { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${encUrl}` },
     { label: "X", href: `https://twitter.com/intent/tweet?text=${enc}` },
   ];
@@ -264,7 +342,12 @@ function SelecionarNumeros({
         if (data.user) {
           const { data: p } = await supabase.rpc("get_my_profile");
           const row = Array.isArray(p) ? p[0] : p;
-          if (row) setBuyer({ nome: row.nome ?? "", email: row.email ?? data.user.email ?? "", telefone: row.telefone ?? "" });
+          if (row)
+            setBuyer({
+              nome: row.nome ?? "",
+              email: row.email ?? data.user.email ?? "",
+              telefone: row.telefone ?? "",
+            });
         }
       });
     }
@@ -272,18 +355,25 @@ function SelecionarNumeros({
 
   function toggle(n: number) {
     if (ocupados.has(n)) return;
-    setSelecionados(selecionados.includes(n) ? selecionados.filter((x) => x !== n) : [...selecionados, n]);
+    setSelecionados(
+      selecionados.includes(n) ? selecionados.filter((x) => x !== n) : [...selecionados, n],
+    );
   }
 
   function aleatorio(qtd: number) {
+    // Soma `qtd` novos números aleatórios aos já selecionados (não substitui),
+    // e nunca repete um número que já esteja ocupado ou já escolhido.
+    const jaEscolhidos = new Set(selecionados);
     const disponiveis: number[] = [];
-    for (let i = 1; i <= rifa.quantidade_numeros; i++) if (!ocupados.has(i)) disponiveis.push(i);
-    const escolhidos: number[] = [];
+    for (let i = 1; i <= rifa.quantidade_numeros; i++) {
+      if (!ocupados.has(i) && !jaEscolhidos.has(i)) disponiveis.push(i);
+    }
+    const novos: number[] = [];
     for (let i = 0; i < qtd && disponiveis.length; i++) {
       const idx = Math.floor(Math.random() * disponiveis.length);
-      escolhidos.push(disponiveis.splice(idx, 1)[0]);
+      novos.push(disponiveis.splice(idx, 1)[0]);
     }
-    setSelecionados(escolhidos);
+    setSelecionados([...selecionados, ...novos]);
   }
 
   async function reservar() {
@@ -330,7 +420,9 @@ function SelecionarNumeros({
     setChavePix((chave as string) || "");
     setReservedIds((inserted ?? []).map((r) => r.id));
     setPending(false);
-    try { localStorage.removeItem("rifa_pending"); } catch {}
+    try {
+      localStorage.removeItem("rifa_pending");
+    } catch {}
     toast.success("Números reservados! Agora efetue o PIX.");
     setShowPix(true);
     onSuccess();
@@ -348,10 +440,18 @@ function SelecionarNumeros({
         {!showPix ? (
           <>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="secondary" onClick={() => aleatorio(1)}>+1 aleatório</Button>
-              <Button size="sm" variant="secondary" onClick={() => aleatorio(5)}>+5 aleatórios</Button>
-              <Button size="sm" variant="secondary" onClick={() => aleatorio(10)}>+10 aleatórios</Button>
-              <Button size="sm" variant="ghost" onClick={() => setSelecionados([])}>Limpar</Button>
+              <Button size="sm" variant="secondary" onClick={() => aleatorio(1)}>
+                +1 aleatório
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => aleatorio(5)}>
+                +5 aleatórios
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => aleatorio(10)}>
+                +10 aleatórios
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSelecionados([])}>
+                Limpar
+              </Button>
             </div>
 
             <div className="max-h-72 overflow-y-auto rounded-lg border p-2">
@@ -384,15 +484,25 @@ function SelecionarNumeros({
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <Label>Seu nome *</Label>
-                <Input value={buyer.nome} onChange={(e) => setBuyer({ ...buyer, nome: e.target.value })} />
+                <Input
+                  value={buyer.nome}
+                  onChange={(e) => setBuyer({ ...buyer, nome: e.target.value })}
+                />
               </div>
               <div>
                 <Label>Telefone *</Label>
-                <Input value={buyer.telefone} onChange={(e) => setBuyer({ ...buyer, telefone: e.target.value })} />
+                <Input
+                  value={buyer.telefone}
+                  onChange={(e) => setBuyer({ ...buyer, telefone: e.target.value })}
+                />
               </div>
               <div className="sm:col-span-2">
                 <Label>E-mail</Label>
-                <Input type="email" value={buyer.email} onChange={(e) => setBuyer({ ...buyer, email: e.target.value })} />
+                <Input
+                  type="email"
+                  value={buyer.email}
+                  onChange={(e) => setBuyer({ ...buyer, email: e.target.value })}
+                />
               </div>
             </div>
 
@@ -402,7 +512,9 @@ function SelecionarNumeros({
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button variant="ghost" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
               <Button onClick={reservar} disabled={pending || selecionados.length === 0}>
                 {pending ? "Reservando…" : "Reservar e pagar"}
               </Button>
@@ -502,9 +614,14 @@ function PagamentoPix({
       ) : (
         <>
           <p className="text-sm text-muted-foreground">
-            Escaneie o QR Code ou copie o código PIX. O pagamento vai <strong>direto para o organizador</strong>.
+            Escaneie o QR Code ou copie o código PIX. O pagamento vai{" "}
+            <strong>direto para o organizador</strong>.
           </p>
-          {qr ? <img src={qr} alt="QR Code PIX" className="mx-auto rounded border" /> : <div className="h-64" />}
+          {qr ? (
+            <img src={qr} alt="QR Code PIX" className="mx-auto rounded border" />
+          ) : (
+            <div className="h-64" />
+          )}
           <p className="text-2xl font-black text-primary">R$ {total.toFixed(2)}</p>
 
           <div className="rounded-lg border bg-muted/40 p-3 text-left text-xs">
@@ -522,7 +639,8 @@ function PagamentoPix({
           <div className="rounded-lg border p-3 text-left">
             <p className="text-sm font-medium">Enviar comprovante</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Após pagar, envie a foto/PDF do comprovante. O organizador aprova sua reserva no painel dele.
+              Após pagar, envie a foto/PDF do comprovante. O organizador aprova sua reserva no
+              painel dele.
             </p>
             <input
               type="file"
@@ -539,7 +657,12 @@ function PagamentoPix({
           </div>
         </>
       )}
-      <Button className="w-full" onClick={onClose}>Fechar</Button>
+      <Button className="w-full" onClick={onClose}>
+        Fechar
+      </Button>
     </div>
   );
 }
+    
+   
+    
