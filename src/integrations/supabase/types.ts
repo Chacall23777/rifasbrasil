@@ -106,6 +106,32 @@ export type Database = {
           },
         ]
       }
+      rifa_slug_redirects: {
+        Row: {
+          created_at: string
+          old_slug: string
+          rifa_id: string
+        }
+        Insert: {
+          created_at?: string
+          old_slug: string
+          rifa_id: string
+        }
+        Update: {
+          created_at?: string
+          old_slug?: string
+          rifa_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rifa_slug_redirects_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rifa_visitas: {
         Row: {
           created_at: string
