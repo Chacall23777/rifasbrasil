@@ -330,6 +330,7 @@ export type Database = {
           slug: string | null
           status: string | null
           titulo: string | null
+          updated_at: string | null
           valor_numero: number | null
           visitas: number | null
         }
@@ -346,6 +347,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           titulo?: string | null
+          updated_at?: string | null
           valor_numero?: number | null
           visitas?: number | null
         }
@@ -362,6 +364,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           titulo?: string | null
+          updated_at?: string | null
           valor_numero?: number | null
           visitas?: number | null
         }
