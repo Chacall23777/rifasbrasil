@@ -19,6 +19,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMinhasRifasRouteImport } from './routes/_authenticated/minhas-rifas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCriarRifaRouteImport } from './routes/_authenticated/criar-rifa'
+import { Route as AuthenticatedRifasIdAprovacoesRouteImport } from './routes/_authenticated/rifas.$id.aprovacoes'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -71,6 +72,12 @@ const AuthenticatedCriarRifaRoute = AuthenticatedCriarRifaRouteImport.update({
   path: '/criar-rifa',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRifasIdAprovacoesRoute =
+  AuthenticatedRifasIdAprovacoesRouteImport.update({
+    id: '/rifas/$id/aprovacoes',
+    path: '/rifas/$id/aprovacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
+  '/rifas/$id/aprovacoes': typeof AuthenticatedRifasIdAprovacoesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +101,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
+  '/rifas/$id/aprovacoes': typeof AuthenticatedRifasIdAprovacoesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/rifas-participadas': typeof AuthenticatedRifasParticipadasRoute
   '/r/$slug': typeof RSlugRoute
+  '/_authenticated/rifas/$id/aprovacoes': typeof AuthenticatedRifasIdAprovacoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/rifas-participadas'
     | '/r/$slug'
+    | '/rifas/$id/aprovacoes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/rifas-participadas'
     | '/r/$slug'
+    | '/rifas/$id/aprovacoes'
   id:
     | '__root__'
     | '/'
@@ -142,6 +154,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/rifas-participadas'
     | '/r/$slug'
+    | '/_authenticated/rifas/$id/aprovacoes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCriarRifaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rifas/$id/aprovacoes': {
+      id: '/_authenticated/rifas/$id/aprovacoes'
+      path: '/rifas/$id/aprovacoes'
+      fullPath: '/rifas/$id/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedRifasIdAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -233,6 +253,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMinhasRifasRoute: typeof AuthenticatedMinhasRifasRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedRifasParticipadasRoute: typeof AuthenticatedRifasParticipadasRoute
+  AuthenticatedRifasIdAprovacoesRoute: typeof AuthenticatedRifasIdAprovacoesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -241,6 +262,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMinhasRifasRoute: AuthenticatedMinhasRifasRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedRifasParticipadasRoute: AuthenticatedRifasParticipadasRoute,
+  AuthenticatedRifasIdAprovacoesRoute: AuthenticatedRifasIdAprovacoesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

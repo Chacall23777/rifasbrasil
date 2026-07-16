@@ -26,6 +26,34 @@ function Dashboard() {
     },
   });
 
+  const { data: stats } = useQuery({
+    queryKey: ["dashboard-stats", user.id],
+    queryFn: async () => {
+      // Todos os números das minhas rifas (org policy permite ler)
+      const { data: rows, error } = await supabase
+        .from("rifa_numeros")
+        .select("comprador_id, status, rifa_id, rifas!inner(valor_numero, organizador_id)")
+        .eq("rifas.organizador_id", user.id);
+      if (error) throw error;
+      let arrecadado = 0;
+      let vendidos = 0;
+      let pendentes = 0;
+      const participantes = new Set<string>();
+      (rows || []).forEach((r: any) => {
+        const s = (r.status || "").toLowerCase();
+        const valor = Number(r.rifas?.valor_numero || 0);
+        if (s === "aprovado") {
+          arrecadado += valor;
+          vendidos += 1;
+          if (r.comprador_id) participantes.add(r.comprador_id);
+        } else if (s === "reservado") {
+          pendentes += 1;
+        }
+      });
+      return { arrecadado, vendidos, pendentes, participantes: participantes.size };
+    },
+  });
+
   const cards = [
     { to: "/criar-rifa", icon: PlusCircle, title: "Criar nova rifa", desc: "Comece uma rifa em minutos" },
     { to: "/minhas-rifas", icon: Ticket, title: "Minhas rifas", desc: "Gerencie e acompanhe" },
@@ -39,6 +67,16 @@ function Dashboard() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <h1 className="text-3xl font-bold">Olá 👋</h1>
         <p className="text-muted-foreground">O que vamos fazer hoje?</p>
+
+        {stats && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Arrecadado (aprovado)" value={`R$ ${stats.arrecadado.toFixed(2)}`} />
+            <StatCard label="Números vendidos" value={String(stats.vendidos)} />
+            <StatCard label="Participantes" value={String(stats.participantes)} />
+            <StatCard label="Pendentes de aprovação" value={String(stats.pendentes)} highlight={stats.pendentes > 0} />
+          </div>
+        )}
+
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c) => (
@@ -92,6 +130,15 @@ function Dashboard() {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className={`rounded-2xl border bg-card p-4 shadow-soft ${highlight ? "border-primary/60" : ""}`}>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`mt-1 text-2xl font-bold ${highlight ? "text-primary" : ""}`}>{value}</p>
     </div>
   );
 }
