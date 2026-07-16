@@ -53,8 +53,8 @@ function RifaPage() {
     queryKey: ["rifa-numeros", rifa.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("rifa_numeros")
-        .select("numero, status, comprador_nome")
+        .from("rifa_numeros_public")
+        .select("numero, status")
         .eq("rifa_id", rifa.id);
       if (error) throw error;
       return data;
@@ -65,7 +65,7 @@ function RifaPage() {
     queryKey: ["organizador", rifa.organizador_id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("nome, cidade, estado")
         .eq("id", rifa.organizador_id)
         .maybeSingle();
