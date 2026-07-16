@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.rifa_numeros_guard_buyer_update() FROM PUBLIC, anon, authenticated;
