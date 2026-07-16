@@ -320,9 +320,16 @@ function SelecionarNumeros({
       comprador_telefone: buyer.telefone,
       status: "reservado",
     }));
-    const { error } = await supabase.from("rifa_numeros").insert(rows);
+    const { data: inserted, error } = await supabase.from("rifa_numeros").insert(rows).select("id");
+    if (error) {
+      setPending(false);
+      return toast.error("Alguém acabou de reservar. Escolha outros números.");
+    }
+    // Fetch chave PIX (only accessible after reservation)
+    const { data: chave } = await supabase.rpc("get_rifa_chave_pix", { _rifa_id: rifa.id });
+    setChavePix((chave as string) || "");
+    setReservedIds((inserted ?? []).map((r) => r.id));
     setPending(false);
-    if (error) return toast.error("Alguém acabou de reservar. Escolha outros números.");
     try { localStorage.removeItem("rifa_pending"); } catch {}
     toast.success("Números reservados! Agora efetue o PIX.");
     setShowPix(true);
