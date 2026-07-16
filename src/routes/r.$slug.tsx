@@ -16,9 +16,9 @@ import { Copy, Share2 } from "lucide-react";
 export const Route = createFileRoute("/r/$slug")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
-      .from("rifas")
+      .from("rifas_public")
       .select(
-        "id, slug, titulo, descricao, foto_principal, quantidade_numeros, valor_numero, data_sorteio, data_encerramento, chave_pix, regulamento, status, organizador_id, visitas",
+        "id, slug, titulo, descricao, foto_principal, quantidade_numeros, valor_numero, data_sorteio, data_encerramento, regulamento, status, organizador_id, visitas",
       )
       .eq("slug", params.slug)
       .maybeSingle();
