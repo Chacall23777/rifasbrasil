@@ -323,13 +323,17 @@ export type Database = {
           data_sorteio: string | null
           descricao: string | null
           foto_principal: string | null
+          galeria: Json | null
           id: string | null
+          nome_ganhador: string | null
+          numero_vencedor: number | null
           organizador_id: string | null
           quantidade_numeros: number | null
           regulamento: string | null
           slug: string | null
           status: string | null
           titulo: string | null
+          updated_at: string | null
           valor_numero: number | null
           visitas: number | null
         }
@@ -339,13 +343,17 @@ export type Database = {
           data_sorteio?: string | null
           descricao?: string | null
           foto_principal?: string | null
+          galeria?: Json | null
           id?: string | null
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
           organizador_id?: string | null
           quantidade_numeros?: number | null
           regulamento?: string | null
           slug?: string | null
           status?: string | null
           titulo?: string | null
+          updated_at?: string | null
           valor_numero?: number | null
           visitas?: number | null
         }
@@ -355,13 +363,17 @@ export type Database = {
           data_sorteio?: string | null
           descricao?: string | null
           foto_principal?: string | null
+          galeria?: Json | null
           id?: string | null
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
           organizador_id?: string | null
           quantidade_numeros?: number | null
           regulamento?: string | null
           slug?: string | null
           status?: string | null
           titulo?: string | null
+          updated_at?: string | null
           valor_numero?: number | null
           visitas?: number | null
         }
