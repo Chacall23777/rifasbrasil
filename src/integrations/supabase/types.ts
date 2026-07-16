@@ -323,7 +323,10 @@ export type Database = {
           data_sorteio: string | null
           descricao: string | null
           foto_principal: string | null
+          galeria: Json | null
           id: string | null
+          nome_ganhador: string | null
+          numero_vencedor: number | null
           organizador_id: string | null
           quantidade_numeros: number | null
           regulamento: string | null
@@ -340,7 +343,10 @@ export type Database = {
           data_sorteio?: string | null
           descricao?: string | null
           foto_principal?: string | null
+          galeria?: Json | null
           id?: string | null
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
           organizador_id?: string | null
           quantidade_numeros?: number | null
           regulamento?: string | null
@@ -357,7 +363,10 @@ export type Database = {
           data_sorteio?: string | null
           descricao?: string | null
           foto_principal?: string | null
+          galeria?: Json | null
           id?: string | null
+          nome_ganhador?: string | null
+          numero_vencedor?: number | null
           organizador_id?: string | null
           quantidade_numeros?: number | null
           regulamento?: string | null
