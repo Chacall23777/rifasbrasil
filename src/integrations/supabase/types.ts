@@ -104,6 +104,13 @@ export type Database = {
             referencedRelation: "rifas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "rifa_numeros_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rifa_slug_redirects: {
@@ -130,6 +137,13 @@ export type Database = {
             referencedRelation: "rifas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "rifa_slug_redirects_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rifa_visitas: {
@@ -154,6 +168,13 @@ export type Database = {
             columns: ["rifa_id"]
             isOneToOne: false
             referencedRelation: "rifas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rifa_visitas_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas_public"
             referencedColumns: ["id"]
           },
         ]
@@ -286,7 +307,65 @@ export type Database = {
             referencedRelation: "rifas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "rifa_numeros_rifa_id_fkey"
+            columns: ["rifa_id"]
+            isOneToOne: false
+            referencedRelation: "rifas_public"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      rifas_public: {
+        Row: {
+          created_at: string | null
+          data_encerramento: string | null
+          data_sorteio: string | null
+          descricao: string | null
+          foto_principal: string | null
+          id: string | null
+          organizador_id: string | null
+          quantidade_numeros: number | null
+          regulamento: string | null
+          slug: string | null
+          status: string | null
+          titulo: string | null
+          valor_numero: number | null
+          visitas: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_encerramento?: string | null
+          data_sorteio?: string | null
+          descricao?: string | null
+          foto_principal?: string | null
+          id?: string | null
+          organizador_id?: string | null
+          quantidade_numeros?: number | null
+          regulamento?: string | null
+          slug?: string | null
+          status?: string | null
+          titulo?: string | null
+          valor_numero?: number | null
+          visitas?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          data_encerramento?: string | null
+          data_sorteio?: string | null
+          descricao?: string | null
+          foto_principal?: string | null
+          id?: string | null
+          organizador_id?: string | null
+          quantidade_numeros?: number | null
+          regulamento?: string | null
+          slug?: string | null
+          status?: string | null
+          titulo?: string | null
+          valor_numero?: number | null
+          visitas?: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {
@@ -356,6 +435,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_rifa_chave_pix: { Args: { _rifa_id: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
