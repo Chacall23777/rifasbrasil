@@ -9,38 +9,127 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as AuthenticatedMinhasRifasRouteImport } from './routes/_authenticated/minhas-rifas'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCriarRifaRouteImport } from './routes/_authenticated/criar-rifa'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RSlugRoute = RSlugRouteImport.update({
+  id: '/r/$slug',
+  path: '/r/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMinhasRifasRoute =
+  AuthenticatedMinhasRifasRouteImport.update({
+    id: '/minhas-rifas',
+    path: '/minhas-rifas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCriarRifaRoute = AuthenticatedCriarRifaRouteImport.update({
+  id: '/criar-rifa',
+  path: '/criar-rifa',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/criar-rifa': typeof AuthenticatedCriarRifaRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/criar-rifa': typeof AuthenticatedCriarRifaRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/criar-rifa': typeof AuthenticatedCriarRifaRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/minhas-rifas': typeof AuthenticatedMinhasRifasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/criar-rifa'
+    | '/dashboard'
+    | '/minhas-rifas'
+    | '/r/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/criar-rifa'
+    | '/dashboard'
+    | '/minhas-rifas'
+    | '/r/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/criar-rifa'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/minhas-rifas'
+    | '/r/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  RSlugRoute: typeof RSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +137,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$slug': {
+      id: '/r/$slug'
+      path: '/r/$slug'
+      fullPath: '/r/$slug'
+      preLoaderRoute: typeof RSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/minhas-rifas': {
+      id: '/_authenticated/minhas-rifas'
+      path: '/minhas-rifas'
+      fullPath: '/minhas-rifas'
+      preLoaderRoute: typeof AuthenticatedMinhasRifasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/criar-rifa': {
+      id: '/_authenticated/criar-rifa'
+      path: '/criar-rifa'
+      fullPath: '/criar-rifa'
+      preLoaderRoute: typeof AuthenticatedCriarRifaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCriarRifaRoute: typeof AuthenticatedCriarRifaRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMinhasRifasRoute: typeof AuthenticatedMinhasRifasRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCriarRifaRoute: AuthenticatedCriarRifaRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMinhasRifasRoute: AuthenticatedMinhasRifasRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  RSlugRoute: RSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
