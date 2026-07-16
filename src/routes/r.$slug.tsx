@@ -442,19 +442,23 @@ function PagamentoPix({
   onClose: () => void;
 }) {
   const [qr, setQr] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const [sent, setSent] = useState(false);
   const payload = useMemo(
     () =>
-      gerarPixPayload({
-        chave: rifa.chave_pix,
-        valor: total,
-        nomeRecebedor: nomeComprador || "RIFASBRASIL",
-        descricao: `Rifa ${rifa.titulo}`.slice(0, 60),
-      }),
-    [rifa, total, nomeComprador],
+      chavePix
+        ? gerarPixPayload({
+            chave: chavePix,
+            valor: total,
+            nomeRecebedor: nomeComprador || "RIFASBRASIL",
+            descricao: `Rifa ${rifa.titulo}`.slice(0, 60),
+          })
+        : "",
+    [chavePix, total, nomeComprador, rifa.titulo],
   );
 
   useEffect(() => {
-    QRCode.toDataURL(payload, { width: 260, margin: 1 }).then(setQr);
+    if (payload) QRCode.toDataURL(payload, { width: 260, margin: 1 }).then(setQr);
   }, [payload]);
 
   async function copiar() {
@@ -462,19 +466,79 @@ function PagamentoPix({
     toast.success("Código PIX copiado!");
   }
 
+  async function copiarChave() {
+    await navigator.clipboard.writeText(chavePix);
+    toast.success("Chave PIX copiada!");
+  }
+
+  async function enviarComprovante(file: File) {
+    if (!userId || reservedIds.length === 0) return;
+    if (file.size > 5 * 1024 * 1024) return toast.error("Arquivo acima de 5 MB");
+    setUploading(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const stamp = Date.now();
+    const path = `${rifa.id}/${userId}/${stamp}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("comprovantes")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (upErr) {
+      setUploading(false);
+      return toast.error("Falha ao enviar o comprovante");
+    }
+    const { error: updErr } = await supabase
+      .from("rifa_numeros")
+      .update({ comprovante_url: path })
+      .in("id", reservedIds);
+    setUploading(false);
+    if (updErr) return toast.error("Falha ao registrar o comprovante");
+    setSent(true);
+    toast.success("Comprovante enviado! O organizador vai aprovar em breve.");
+  }
+
   return (
     <div className="space-y-4 text-center">
-      <p className="text-sm text-muted-foreground">
-        Escaneie o QR Code ou copie o código PIX. O pagamento vai <strong>direto para o organizador</strong>.
-      </p>
-      {qr ? <img src={qr} alt="QR Code PIX" className="mx-auto rounded border" /> : <div className="h-64" />}
-      <p className="text-2xl font-black text-primary">R$ {total.toFixed(2)}</p>
-      <Button onClick={copiar} variant="outline" className="w-full">
-        <Copy className="mr-2 h-4 w-4" /> Copiar código PIX
-      </Button>
-      <p className="text-xs text-muted-foreground">
-        Após o pagamento, envie o comprovante ao organizador via WhatsApp. Ele aprovará sua reserva.
-      </p>
+      {!chavePix ? (
+        <p className="text-sm text-muted-foreground">Carregando dados do pagamento…</p>
+      ) : (
+        <>
+          <p className="text-sm text-muted-foreground">
+            Escaneie o QR Code ou copie o código PIX. O pagamento vai <strong>direto para o organizador</strong>.
+          </p>
+          {qr ? <img src={qr} alt="QR Code PIX" className="mx-auto rounded border" /> : <div className="h-64" />}
+          <p className="text-2xl font-black text-primary">R$ {total.toFixed(2)}</p>
+
+          <div className="rounded-lg border bg-muted/40 p-3 text-left text-xs">
+            <p className="font-medium text-foreground">Chave PIX do organizador</p>
+            <p className="mt-1 break-all text-muted-foreground">{chavePix}</p>
+            <Button size="sm" variant="ghost" className="mt-1" onClick={copiarChave}>
+              <Copy className="mr-1 h-3.5 w-3.5" /> Copiar chave
+            </Button>
+          </div>
+
+          <Button onClick={copiar} variant="outline" className="w-full">
+            <Copy className="mr-2 h-4 w-4" /> Copiar código PIX (copia e cola)
+          </Button>
+
+          <div className="rounded-lg border p-3 text-left">
+            <p className="text-sm font-medium">Enviar comprovante</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Após pagar, envie a foto/PDF do comprovante. O organizador aprova sua reserva no painel dele.
+            </p>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              className="mt-2 block w-full text-xs"
+              disabled={uploading || sent}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) enviarComprovante(f);
+              }}
+            />
+            {uploading && <p className="mt-1 text-xs text-muted-foreground">Enviando…</p>}
+            {sent && <p className="mt-1 text-xs text-emerald-600">Comprovante enviado ✔</p>}
+          </div>
+        </>
+      )}
       <Button className="w-full" onClick={onClose}>Fechar</Button>
     </div>
   );
