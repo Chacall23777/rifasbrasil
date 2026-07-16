@@ -89,6 +89,41 @@ function RifaPage() {
   const [openReserva, setOpenReserva] = useState(false);
   const [selecionados, setSelecionados] = useState<number[]>([]);
 
+  // Restaura carrinho salvo (mesma rifa) e retoma o fluxo após login
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("rifa_pending");
+      if (!raw) return;
+      const pending = JSON.parse(raw) as { slug: string; numeros: number[]; autoOpen?: boolean };
+      if (pending.slug !== rifa.slug) return;
+      if (Array.isArray(pending.numeros) && pending.numeros.length) {
+        setSelecionados(pending.numeros);
+      }
+      if (pending.autoOpen) {
+        setOpenReserva(true);
+      }
+    } catch {}
+  }, [rifa.slug]);
+
+  // Persiste seleção do usuário na rifa atual
+  useEffect(() => {
+    try {
+      if (selecionados.length === 0) {
+        const raw = localStorage.getItem("rifa_pending");
+        if (raw) {
+          const p = JSON.parse(raw);
+          if (p.slug === rifa.slug) localStorage.removeItem("rifa_pending");
+        }
+        return;
+      }
+      localStorage.setItem(
+        "rifa_pending",
+        JSON.stringify({ slug: rifa.slug, numeros: selecionados }),
+      );
+    } catch {}
+  }, [selecionados, rifa.slug]);
+
+
   return (
     <div className="min-h-screen bg-accent/20">
       <SiteHeader />
