@@ -68,6 +68,16 @@ function Dashboard() {
         <h1 className="text-3xl font-bold">Olá 👋</h1>
         <p className="text-muted-foreground">O que vamos fazer hoje?</p>
 
+        {stats && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Arrecadado (aprovado)" value={`R$ ${stats.arrecadado.toFixed(2)}`} />
+            <StatCard label="Números vendidos" value={String(stats.vendidos)} />
+            <StatCard label="Participantes" value={String(stats.participantes)} />
+            <StatCard label="Pendentes de aprovação" value={String(stats.pendentes)} highlight={stats.pendentes > 0} />
+          </div>
+        )}
+
+
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c) => (
             <Link
