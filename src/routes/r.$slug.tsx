@@ -212,12 +212,9 @@ function SelecionarNumeros({
       supabase.auth.getUser().then(async ({ data }) => {
         setUserChecked(data.user);
         if (data.user) {
-          const { data: p } = await supabase
-            .from("profiles")
-            .select("nome, email, telefone")
-            .eq("id", data.user.id)
-            .maybeSingle();
-          if (p) setBuyer({ nome: p.nome ?? "", email: p.email ?? data.user.email ?? "", telefone: p.telefone ?? "" });
+          const { data: p } = await supabase.rpc("get_my_profile");
+          const row = Array.isArray(p) ? p[0] : p;
+          if (row) setBuyer({ nome: row.nome ?? "", email: row.email ?? data.user.email ?? "", telefone: row.telefone ?? "" });
         }
       });
     }
