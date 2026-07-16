@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/criar-rifa")({
 
 const schema = z.object({
   titulo: z.string().trim().min(3, "Título muito curto").max(120),
+  slug_custom: z.string().trim().max(60).optional(),
   descricao: z.string().max(2000).optional(),
   foto_principal: z.string().url("URL inválida").optional().or(z.literal("")),
   quantidade_numeros: z.number().int().min(2).max(100000),
@@ -33,6 +34,7 @@ function CriarRifa() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     titulo: "",
+    slug_custom: "",
     descricao: "",
     foto_principal: "",
     quantidade_numeros: 100,
@@ -49,10 +51,20 @@ function CriarRifa() {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
     setLoading(true);
-    // gera slug único
-    let slug = slugify(form.titulo) || "rifa";
-    const { data: existing } = await supabase.from("rifas").select("id").eq("slug", slug).maybeSingle();
-    if (existing) slug = `${slug}-${randomSuffix()}`;
+    // Slug: usa o personalizado se informado, senão gera do título
+    const base = slugify(form.slug_custom || form.titulo) || "rifa";
+    let slug = base;
+    const [{ data: r1 }, { data: r2 }] = await Promise.all([
+      supabase.from("rifas").select("id").eq("slug", slug).maybeSingle(),
+      supabase.from("rifa_slug_redirects").select("old_slug").eq("old_slug", slug).maybeSingle(),
+    ]);
+    if (r1 || r2) {
+      if (form.slug_custom) {
+        setLoading(false);
+        return toast.error("Este link já está em uso. Escolha outro.");
+      }
+      slug = `${base}-${randomSuffix()}`;
+    }
 
     const { data, error } = await supabase
       .from("rifas")
@@ -89,6 +101,20 @@ function CriarRifa() {
           <div>
             <Label>Nome da rifa *</Label>
             <Input required value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} placeholder="Ex: Rifa da PlayStation 5" />
+          </div>
+          <div>
+            <Label>Link personalizado (opcional)</Label>
+            <div className="mt-1 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+              <span className="text-muted-foreground">rifasbrasil.com/r/</span>
+              <input
+                value={form.slug_custom}
+                onChange={(e) => setForm({ ...form, slug_custom: e.target.value })}
+                placeholder="ex: iphone16pro"
+                maxLength={60}
+                className="flex-1 bg-transparent outline-none"
+              />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Deixe em branco para gerar automaticamente a partir do nome.</p>
           </div>
           <div>
             <Label>Foto principal (URL)</Label>

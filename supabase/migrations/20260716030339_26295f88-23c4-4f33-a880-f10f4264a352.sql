@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.rifas_guard_slug_update() FROM PUBLIC, anon, authenticated;

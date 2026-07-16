@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QRCode from "qrcode";
@@ -23,7 +23,16 @@ export const Route = createFileRoute("/r/$slug")({
       .eq("slug", params.slug)
       .maybeSingle();
     if (error) throw error;
-    if (!data) throw notFound();
+    if (!data) {
+      const { data: red } = await supabase
+        .from("rifa_slug_redirects")
+        .select("rifa_id, rifas!inner(slug)")
+        .eq("old_slug", params.slug)
+        .maybeSingle();
+      const newSlug = (red as any)?.rifas?.slug;
+      if (newSlug) throw redirect({ to: "/r/$slug", params: { slug: newSlug }, replace: true });
+      throw notFound();
+    }
     return { rifa: data };
   },
   head: ({ loaderData }) => ({
@@ -79,6 +88,41 @@ function RifaPage() {
 
   const [openReserva, setOpenReserva] = useState(false);
   const [selecionados, setSelecionados] = useState<number[]>([]);
+
+  // Restaura carrinho salvo (mesma rifa) e retoma o fluxo após login
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("rifa_pending");
+      if (!raw) return;
+      const pending = JSON.parse(raw) as { slug: string; numeros: number[]; autoOpen?: boolean };
+      if (pending.slug !== rifa.slug) return;
+      if (Array.isArray(pending.numeros) && pending.numeros.length) {
+        setSelecionados(pending.numeros);
+      }
+      if (pending.autoOpen) {
+        setOpenReserva(true);
+      }
+    } catch {}
+  }, [rifa.slug]);
+
+  // Persiste seleção do usuário na rifa atual
+  useEffect(() => {
+    try {
+      if (selecionados.length === 0) {
+        const raw = localStorage.getItem("rifa_pending");
+        if (raw) {
+          const p = JSON.parse(raw);
+          if (p.slug === rifa.slug) localStorage.removeItem("rifa_pending");
+        }
+        return;
+      }
+      localStorage.setItem(
+        "rifa_pending",
+        JSON.stringify({ slug: rifa.slug, numeros: selecionados }),
+      );
+    } catch {}
+  }, [selecionados, rifa.slug]);
+
 
   return (
     <div className="min-h-screen bg-accent/20">
@@ -238,7 +282,14 @@ function SelecionarNumeros({
 
   async function reservar() {
     if (!userChecked) {
-      toast.error("Faça login para participar");
+      // Salva rifa + números selecionados para retomar automaticamente após o login
+      try {
+        localStorage.setItem(
+          "rifa_pending",
+          JSON.stringify({ slug: rifa.slug, numeros: selecionados, autoOpen: true }),
+        );
+      } catch {}
+      toast.message("Crie sua conta em 30s para participar");
       window.location.href = "/auth?redirect=" + encodeURIComponent(window.location.pathname);
       return;
     }
@@ -266,6 +317,7 @@ function SelecionarNumeros({
     const { error } = await supabase.from("rifa_numeros").insert(rows);
     setPending(false);
     if (error) return toast.error("Alguém acabou de reservar. Escolha outros números.");
+    try { localStorage.removeItem("rifa_pending"); } catch {}
     toast.success("Números reservados! Agora efetue o PIX.");
     setShowPix(true);
     onSuccess();
