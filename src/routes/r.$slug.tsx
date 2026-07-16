@@ -317,6 +317,7 @@ function SelecionarNumeros({
     const { error } = await supabase.from("rifa_numeros").insert(rows);
     setPending(false);
     if (error) return toast.error("Alguém acabou de reservar. Escolha outros números.");
+    try { localStorage.removeItem("rifa_pending"); } catch {}
     toast.success("Números reservados! Agora efetue o PIX.");
     setShowPix(true);
     onSuccess();
