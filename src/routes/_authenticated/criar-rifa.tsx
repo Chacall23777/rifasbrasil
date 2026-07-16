@@ -103,6 +103,20 @@ function CriarRifa() {
             <Input required value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} placeholder="Ex: Rifa da PlayStation 5" />
           </div>
           <div>
+            <Label>Link personalizado (opcional)</Label>
+            <div className="mt-1 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+              <span className="text-muted-foreground">rifasbrasil.com/r/</span>
+              <input
+                value={form.slug_custom}
+                onChange={(e) => setForm({ ...form, slug_custom: e.target.value })}
+                placeholder="ex: iphone16pro"
+                maxLength={60}
+                className="flex-1 bg-transparent outline-none"
+              />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Deixe em branco para gerar automaticamente a partir do nome.</p>
+          </div>
+          <div>
             <Label>Foto principal (URL)</Label>
             <Input value={form.foto_principal} onChange={(e) => setForm({ ...form, foto_principal: e.target.value })} placeholder="https://..." />
             <p className="mt-1 text-xs text-muted-foreground">Cole o link de uma imagem pública.</p>
