@@ -409,14 +409,38 @@ function SelecionarNumeros({
             </DialogFooter>
           </>
         ) : (
-          <PagamentoPix rifa={rifa} total={total} nomeComprador={buyer.nome} onClose={() => onOpenChange(false)} />
+          <PagamentoPix
+            rifa={rifa}
+            total={total}
+            nomeComprador={buyer.nome}
+            chavePix={chavePix}
+            reservedIds={reservedIds}
+            userId={userChecked?.id}
+            onClose={() => onOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function PagamentoPix({ rifa, total, nomeComprador, onClose }: { rifa: any; total: number; nomeComprador: string; onClose: () => void }) {
+function PagamentoPix({
+  rifa,
+  total,
+  nomeComprador,
+  chavePix,
+  reservedIds,
+  userId,
+  onClose,
+}: {
+  rifa: any;
+  total: number;
+  nomeComprador: string;
+  chavePix: string;
+  reservedIds: string[];
+  userId?: string;
+  onClose: () => void;
+}) {
   const [qr, setQr] = useState<string>("");
   const payload = useMemo(
     () =>
