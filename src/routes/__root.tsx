@@ -89,11 +89,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Crie, compartilhe e gerencie rifas online. Receba direto no seu PIX. 100% grátis.",
+          "Plataforma gratuita para criar rifas online, receber pagamentos direto no seu PIX e compartilhar por link. Sem taxas, sem intermediário.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "RIFASBRASIL" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "RIFASBRASIL — Crie sua rifa online grátis" },
+      { name: "twitter:description", content: "Plataforma gratuita para criar rifas online, receber pagamentos direto no seu PIX e compartilhar por link. Sem taxas, sem intermediário." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7015f3ed-322b-435c-8513-6045ce06b5b6/id-preview-a89642a5--0295efe2-dbbf-4ced-935a-ec98b6a9c184.lovable.app-1784169195772.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7015f3ed-322b-435c-8513-6045ce06b5b6/id-preview-a89642a5--0295efe2-dbbf-4ced-935a-ec98b6a9c184.lovable.app-1784169195772.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
