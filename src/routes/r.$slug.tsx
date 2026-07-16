@@ -37,16 +37,18 @@ export const Route = createFileRoute("/r/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Rifa — RIFASBRASIL" }] };
+    const titulo = loaderData.rifa.titulo ?? "Rifa";
     const desc = loaderData.rifa.descricao?.slice(0, 155) || "Participe desta rifa no RIFASBRASIL.";
-    return {
-      meta: [
-        { title: `${loaderData.rifa.titulo} — RIFASBRASIL` },
-        { name: "description", content: desc },
-        { property: "og:title", content: loaderData.rifa.titulo },
-        { property: "og:description", content: desc },
-        ...(loaderData.rifa.foto_principal ? [{ property: "og:image", content: loaderData.rifa.foto_principal }] : []),
-      ],
-    };
+    const meta: { title?: string; name?: string; property?: string; content?: string }[] = [
+      { title: `${titulo} — RIFASBRASIL` },
+      { name: "description", content: desc },
+      { property: "og:title", content: titulo },
+      { property: "og:description", content: desc },
+    ];
+    if (loaderData.rifa.foto_principal) {
+      meta.push({ property: "og:image", content: loaderData.rifa.foto_principal });
+    }
+    return { meta };
   },
   component: RifaPage,
 });
