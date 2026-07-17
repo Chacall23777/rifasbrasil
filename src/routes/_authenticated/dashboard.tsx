@@ -42,7 +42,9 @@ function Dashboard() {
       (rows || []).forEach((r: any) => {
         const s = (r.status || "").toLowerCase();
         const valor = Number(r.rifas?.valor_numero || 0);
-        if (s === "aprovado") {
+        // O status válido na tabela é 'pago' (não 'aprovado') — o check constraint
+        // rifa_numeros_status_check só aceita 'reservado' | 'pago' | 'cancelado'.
+        if (s === "pago") {
           arrecadado += valor;
           vendidos += 1;
           if (r.comprador_id) participantes.add(r.comprador_id);
@@ -142,3 +144,8 @@ function StatCard({ label, value, highlight }: { label: string; value: string; h
     </div>
   );
 }
+
+
+
+
+  
